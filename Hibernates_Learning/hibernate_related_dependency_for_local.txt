@@ -1,0 +1,29 @@
+<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>3.6.10.Final</version>
+</dependency>
+
+
+<dependency>
+			<groupId>javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.12.1.GA</version>
+</dependency>
+
+<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.1.0</version>
+</dependency>
+
+
+logi to system user SQL:
+sys as sysdba 
+password
+
+
+alter user hr identified by hr;
+
+
+SANJEEK9-LXXCS.cisco.com , 1521, xepdb1

@@ -1,0 +1,42 @@
+https://github.com/in28minutes/spring-microservices-v3/blob/main/03.microservices/step13.md
+
+
+RestTemplate is used to call rest API
+
+  HashMap<String,String> uriVariables = new HashMap<String,String>();
+  uriVariables.put("from" ,from );
+  uriVariables.put("to" , to );
+
+ ResponseEntity<CurrencyCOnversion> responseEntity = new RestTemplate().getForEntity
+ ("http://localhost:8000/currency-exchange/from/{from}/to/{to}" , CurrencyConversion.class , uriVariables) ;
+ 
+ CurrencyCOnversion currencyCOnversion = responseEntity.getBody();
+ 
+--------------------------------------------------------------------------------------------------------------
+
+FeignRestClient
+
+
+==============================================================================================================
+NamingServerApplication
+
+@EnableEurekaServer
+@SpringBootApplication
+public class NamingServerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(NamingServerApplication.class, args);
+	}
+
+}
+
+-------------------------------------------------------------------------------
+spring.application.name=naming-server
+server.port=8761
+
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false 
+-------------------------------------------------------------------------------
+//@FeignClient(name="currency-exchange", url="localhost:8000")
+@FeignClient(name="currency-exchange")
+public interface CurrencyExchangeProxy {

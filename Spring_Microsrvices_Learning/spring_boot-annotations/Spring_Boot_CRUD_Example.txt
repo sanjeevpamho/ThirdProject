@@ -1,0 +1,45 @@
+hibernate configuration in Spring Boot
+: Add below properties in application.properties
+spring.datasource.url=jdbc:mysql://localhost:3306/codedecode?useSSL=false
+spring.datasource.username=root
+spring.datasource.password=root
+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+spring.jpa.hibernate.ddl-auto=update
+
+
+@RestController
+@RequestMapping("/code")
+public class EmployeeController{
+ 
+ @Autowired
+ private EmployeeServiceInterface employeeServiceInterface;
+ 
+ @PostMapping("/save")
+ public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
+  Employee savedEmployee=employeeServiceInterface.addEmployee(employee);
+  return new ResponseEntity<Employee>(savedEmployee, HttpStatus.CREATED);
+ }
+}
+--------------------------------------------------------------------------------------
+  for delete :
+  return new ResponseEntity<Employee>(savedEmployee, HttpStatus.ACCEPTED);
+  
+  for get :
+  return new ResponseEntity<Employee>(savedEmployee, HttpStatus.OK);
+  
+--------------------------------------------------------------------------------------
+Following Proper Design Pattern to write our service class
+
+@Service 
+public class EmployeeService implements EmployeeServiceInterface{
+  @Autowired
+  private EmployeeCurdRepo curdRepo;
+  
+  @Override
+  public Employee addEmployee(Employee employee){
+   Employee savedEmployee = curdRepo.save(employee);
+   return savedEmployee;
+  }
+    
+}  

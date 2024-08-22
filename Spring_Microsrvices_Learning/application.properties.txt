@@ -1,0 +1,64 @@
+spring.application.name=currency-exchange
+server.port=8000
+
+spring.jpa.show-sql=true
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.h2.console.enabled=true
+
+
+https://github.com/in28minutes/spring-microservices-v3/blob/main/03.microservices/01-step-by-step-changes/readme.md#eureka---step-19-to-21
+
+eureka.client.serviceUrl.defaultZone=http:/localhost:8761/eureka
+
+<!--   API Gateway   -->
+spring.cloud.gateway.discovery.locator.enabled=true
+spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+
+
+==========================================================================
+Use the following repo's based on your Spring Boot version
+
+Spring Boot 3.0+ - https://github.com/in28minutes/spring-microservices-v3
+
+Spring Boot 2.4+ - https://github.com/in28minutes/spring-microservices-v2
+
+
+@EnableFeignClients
+
+
+Eureka : http://localhost:8761
+
+API Gateway : http://localhost:8765
+
+Initial
+
+- http://localhost:8765/CURRENCY-EXCHANGE/currency-exchange/from/USD/to/INR
+
+- http://localhost:8765/CURRENCY-CONVERSION/currency-conversion/from/USD/to/INR/quantity/10
+
+- http://localhost:8765/CURRENCY-CONVERSION/currency-conversion-feign/from/USD/to/INR/quantity/10
+
+
+
+Lower Case
+
+- http://localhost:8765/currency-exchange/currency-exchange/from/USD/to/INR
+
+- http://localhost:8765/currency-conversion/currency-conversion/from/USD/to/INR/quantity/10
+
+- http://localhost:8765/currency-conversion/currency-conversion-feign/from/USD/to/INR/quantity/10
+
+
+
+Custom Routes
+
+- http://localhost:8765/currency-exchange/from/USD/to/INR
+
+- http://localhost:8765/currency-conversion/from/USD/to/INR/quantity/10
+
+- http://localhost:8765/currency-conversion-feign/from/USD/to/INR/quantity/10
+
+- http://localhost:8765/currency-conversion-new/from/USD/to/INR/quantity/10
+
+
+

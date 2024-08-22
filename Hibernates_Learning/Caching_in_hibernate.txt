@@ -1,0 +1,114 @@
+Caching in Hibernate:
+ ->Hibernate caching improves the performance of the application by pooling the object in the cache. 
+ It is useful when we have to fetch the same data multiple times.
+ 
+ There are mainly two types of caching: first level cache and second level cache:
+Question:How to enable 1st level cache.
+ 1.>First Level Cache:
+       Hibernate first level cache is associated with the Session object. Hibernate first level cache is enabled by default and there is no way to disable it. However hibernate provides methods through which we can delete selected objects from the cache or clear the cache completely.
+       Any object cached in a session will not be visible to other sessions and when the session is closed, all the cached objects will also be lost.
+	   
+	   We can use session evict() method to remove a single object from the hibernate first level cache.
+       We can use session clear() method to clear the cache i.e delete all the objects from the cache.
+       We can use session contains() method to check if an object is present in the hibernate cache or not, if the object is found in cache, it returns true or else it returns false.
+       Since hibernate cache all the objects into session first level cache, while running bulk queries or batch updates it’s necessary to clear the cache at certain intervals to avoid memory issues.
+	   
+	   example:
+	   
+	public static void main(String[] args) {
+		
+		Employee employee1=new Employee();
+		EmployeeId employeeId1=new EmployeeId(1,"Blogging");
+		employee1.setEmpName("JavaInterviewPoint");
+        employee1.setId(employeeId1);
+        
+        Employee employee2=new Employee();
+        EmployeeId employeeId2=new EmployeeId(2,"Hibernate");
+		employee2.setEmpName("JavaTutorials");
+        employee2.setId(employeeId2);
+        
+        Configuration cfg=new Configuration().configure();
+        SessionFactory sessionFactory=cfg.buildSessionFactory();
+        
+        Session session=sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(employee1);
+        session.save(employee2);
+        session.getTransaction().commit();
+        session.close();
+        
+        Session session1=sessionFactory.openSession();
+        Employee emp=(Employee) session1.get(Employee.class, new EmployeeId(1, "Blogging"));
+        System.out.println(emp.toString());
+        
+        System.out.println("waiting here.update details in db");
+        try {
+			Thread.sleep(20000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        Employee emp1=(Employee) session1.get(Employee.class, new EmployeeId(1, "Blogging"));
+        System.out.println(emp1.toString());
+        
+       System.out.println("creating another session");
+       
+       Session session2=sessionFactory.openSession();
+       Employee emp2=(Employee) session2.get(Employee.class, new EmployeeId(1, "Blogging"));
+       System.out.println(emp2.toString());
+	}
+
+	
+	output:
+	Employee [id=Blogging , dept name:  1, empName=JavaInterviewPoint]
+waiting here.update details in db
+Employee [id=Blogging , dept name:  1, empName=JavaInterviewPoint]
+creating another session
+Hibernate: select employee0_.DEPARTMENT as DEPARTMENT2_0_, employee0_.EMP_ID as EMP2_2_0_, employee0_.EMP_NAME as EMP3_2_0_ from Employee_Details employee0_ where employee0_.DEPARTMENT=? and employee0_.EMP_ID=?
+Employee [id=Blogging , dept name:  1, empName=JavaInterviewPointUpdated]
+
+------------------------------------------------------------------------------------------------------------
+
+ 2.>Second Level Cache
+      Hibernate Second Level cache is disabled by default but we can enable it through configuration. 
+	  Currently EHCache and Infinispan provides implementation for Hibernate Second level cache and we can use them. 
+	  
+	   
+	   
+ different strategies for caching an object.
+
+  1.>Read Only: This caching strategy should be used for persistent objects that will always read but never updated. 
+                It’s good for reading and caching application configuration and other static data that are never updated. 
+                This is the simplest strategy with best performance because there is no overload to check if the object is updated in database or not.
+				
+  2.>Read Write: It’s good for persistent objects that can be updated by the hibernate application. However if the data is updated either through backend or other applications, 
+                 then there is no way hibernate will know about it and data might be stale. So while using this strategy, make sure you are using Hibernate API for updating the data.
+
+  3.>Nonrestricted Read Write: If the application only occasionally needs to update data and strict transaction isolation is not required, a nonstrict-read-write cache might be appropriate.
+  
+  4.>Transactional: The transactional cache strategy provides support for fully transactional cache providers such as JBoss TreeCache. 
+                    Such a cache can only be used in a JTA environment and you must specify hibernate.transaction.manager_lookup_class.
+					
+					
+					
+					
+					
+					EHCacheProvider is the implemented class.
+					
+					<property name="cache.provide_class">org.hibernate.cache.EHCacheProvider</property>
+					<property name="cache.use_second_level_cache">true</property>
+					
+					
+					now use entity in the class as == 
+					@Cacheable
+					@Cache(usage=CacheConcurrencyStrategy.READ_ONLY)
+					
+3.>Query Cache:
+     Hibernate can also cache result set of a query. Hibernate Query Cache doesn’t cache the state of the actual entities in the cache; 
+	 it caches only identifier values and results of value type. So it should always be used in conjunction with the second-level cache.
+
+					<property name="cache.use_query_cache">true</property>
+					
+					
+					use: query.setCacheable(true);

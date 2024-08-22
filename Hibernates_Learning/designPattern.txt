@@ -1,0 +1,78 @@
+https://www.geeksforgeeks.org/facade-design-pattern-introduction/
+
+https://www.educative.io/courses/grokking-the-object-oriented-design-interview/gxM3gRxmr8Z
+https://www.geeksforgeeks.org/design-parking-lot-using-object-oriented-principles/?ref=leftbar-rightbar
+
+->Factory design pattern and Abstract Factory design pattern provides approach to code for interface rather than implementation.
+
+Structural Design Patterns:
+Structural patterns provide different ways to create a class structure, 
+for example using inheritance and composition to create a large object from small objects.
+
+1. Adapter Pattern : its used so that two unrelated interfaces can work together. The object that joins these unrelated interface is called an Adapter.
+2.>Facade Pattern:It hides the complexities of the system and provides an interface to the client from where the client can access the system.
+https://www.geeksforgeeks.org/facade-design-pattern-introduction/
+
+public interface Hotel
+{
+    public Menus getMenus();
+}
+public class NonVegRestaurant implements Hotel
+{
+    public Menus getMenus()
+    {
+        NonVegMenu nv = new NonVegMenu();
+        return nv;
+    }
+}
+public class VegRestaurant implements Hotel
+{
+    public Menus getMenus()
+    {
+        VegMenu v = new VegMenu();
+        return v;
+    }
+}
+public class VegNonBothRestaurant implements Hotel
+{
+    public Menus getMenus()
+    {
+        Both b = new Both();
+        return b;
+    }
+}
+public class HotelKeeper
+{
+    public VegMenu getVegMenu()
+    {
+        VegRestaurant v = new VegRestaurant();
+        VegMenu vegMenu = (VegMenu)v.getMenus();
+        return vegMenu;
+    }
+      
+    public NonVegMenu getNonVegMenu()
+    {
+        NonVegRestaurant v = new NonVegRestaurant();
+        NonVegMenu NonvegMenu = (NonVegMenu)v.getMenus();
+        return NonvegMenu;
+    }
+      
+    public Both getVegNonMenu()
+    {
+        VegNonBothRestaurant v = new VegNonBothRestaurant();
+        Both bothMenu = (Both)v.getMenus();
+        return bothMenu;
+    }    
+}
+public class Client
+{
+    public static void main (String[] args)
+    {
+        HotelKeeper keeper = new HotelKeeper();
+          
+        VegMenu v = keeper.getVegMenu();
+        NonVegMenu nv = keeper.getNonVegMenu();
+        Both = keeper.getVegNonMenu();
+  
+    }
+}

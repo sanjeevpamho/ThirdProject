@@ -1,0 +1,211 @@
+<servlet>
+        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>org.sanjeev.restjava.messenger</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Jersey Web Application</servlet-name>
+        <url-pattern>/webapi/*</url-pattern>
+    </servlet-mapping>
+	
+	+++++++++++++++++(http://localhost:8085/messenger/webapi/messages)++++++++++++++
+	@Path("/messages")
+public class MessageResource {
+	MessageService messageService=new MessageService();
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Message> getMessages(){
+		return messageService.getAllMessgaes();
+	}
+	//we can have path param at method level as well
+	@GET
+	@Path("/{messageId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Message getMessage(@PathParam("messageId") long id){
+		return messageService.getMessage(id);
+	}
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Message addMessage(Message message){
+		return messageService.addMessge(message);
+	}
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Message updateMessage(@PathParam("messageId") long id, Message message){
+		message.setId(id);
+		return messageService.updateMessge(message);
+	}
+	@GET
+@Path("/employee/{dept}/{id}")
+Patient getEmployee(@PathParam("dept")Long dept, @PathParam("id")Long id) ;
+}
+-----------------------------------------------------------------------
+MediaType name:
+1.>MediaType.APPLICATION_JSON
+2.>MediaType.APPLICATION_XML
+3.>MediaType.TEXT_PLAIN
+------------------------------------------------------------------------
+Parameter Annotation:
+1.>@PathParam-
+/test/data/{id}/{name}
+/test/sanjeev/123/Ram
+
+@Path("/data/{id}/{name}")
+        @Produces(MediaType.TEXT_PLAIN)
+	public String add(@PathParam("id") Integer id, @PathParam("name") String name ){
+          //ToDo
+         return "result";
+	}
+--------------------------------------------------------------------------------------------------------------------------------
+	
+2.>	QueryParam :Query parameters are added to the url after the ? mark, while a path parameter is part of the regular URL. 
+
+/test/data?id=123&name=Ram
+
+       @Path("/data/{id}/{name}")
+        @Produces(MediaType.TEXT_PLAIN)
+	public String add(@QueryParam("id") Integer id, @QueryParam("name") String name ){
+          //ToDo
+         return "result";
+	}
+
+---------------------------------------------------------------------------------------------------------------------------------
+3.>@HeaderParam :it is used to get the authorization parameter.
+@HeaderParam("authorization") String authString
+
+---------------------------------------------------------------------------------------------------------------------------------
+4.>CookieParam	
+	
+	@PUT
+public Response updateCookie(@CookieParam("name") Cookie cookie){
+    if (cookie != null){
+        return Response
+                .ok()
+                .cookie(new NewCookie("name", "new-value"))
+                .build();
+    }
+    return Response.ok().build();
+}
+
+--------------------------------------------------------------------------------------------------------------------------------
+5.>FormParam
+
+<html><body><h1>JAX-RS @FormQuery Testing</h1>
+	<form action="rest/user/add" method="post">
+		<p>Name : <input type="text" name="name" /></p>
+		<p>Age : <input type="text" name="age" /></p>
+		<input type="submit" value="Add User" />
+	</form>
+</body></html>
+
+(@FormParam("name") String name,@FormParam("age") int age)
+
+---------------------------------------------------------------------------------------------------------------------------------
+6.>DefaultValue
+
+                           (@DefaultValue("defaultnFirsname") @QueryParam("firstname") String firstname,
+                            @DefaultValue("defaultnLastname") @QueryParam("lastname") String lastname,
+                            @DefaultValue("defaultEmail") @QueryParam("email") String email)
+
+ In the above url we are not passing any parameters, in this case @DefaultValue annotation will consider default values which are we set in service class method.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+7.>Context
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+8.>@MatrixParam
+
+Matrix parameters are a set of “name=value” in URI path separate by a semi colon “;“.
+
+/books/2011;author=mkyong;country=malaysia
+
+public Response getBooks(@PathParam("year") String year,
+			@MatrixParam("author") String author,
+			@MatrixParam("country") String country) {
+
+		return Response
+			.status(200)
+			.entity("getBooks is called, year : " + year
+				+ ", author : " + author + ", country : " + country)
+			.build();
+	}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+Posting the request through the HttpClient
+
+            httpclient = new HttpClient();
+			//Open connection		
+			post= new PostMethod(url);
+			post.setRequestBody(getDocREquestXml);
+			String	contentType = "text/xml;charset=UTF-8";
+			post.setRequestHeader("Content-type", contentType);
+			httpclient.executeMethod(post);
+			response = post.getResponseBodyAsString();	
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Client method to post the request:
+
+			Client client=Client.create();
+			WebResource webResource=client.resource("http://localhost:8085/messenger/webapi/messages");
+			
+			String input = "{\"author\":\"Praveen\",\"created\":\"2014-03-20T00:38:56.472\",\"message\":\"hello praveen\"}";
+
+			ClientResponse response = webResource.type("application/json").post(ClientResponse.class, input);
+
+		/*	if (response.getStatus() != 201) {
+				throw new RuntimeException("Failed : HTTP error code : "
+				     + response.getStatus());
+			}
+*/
+			System.out.println("Output from Server .... \n");
+			String output = response.getEntity(String.class);
+			System.out.println(output);
+			
+			 response = webResource.accept("application/json")
+	                   .get(ClientResponse.class);
+
+			if (response.getStatus() != 200) {
+			   throw new RuntimeException("Failed : HTTP error code : "
+				+ response.getStatus());
+			}
+
+			 output = response.getEntity(String.class);
+
+			System.out.println("Output from Server .... \n");
+			System.out.println(output);
+
+		
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------		
+Way to return response::
+return Response
+			.status(200)
+			.entity("getBooks is called, year : " + year
+				+ ", author : " + author + ", country : " + country)
+			.build();
+			
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------			
+@Consumes both XML and JSON Example
+
+    @POST
+    @Consumes({MediaType.APPLICATION_XML,MediaType.APPLICATION_JSON})
+	
+	In the postman client under "Body" tab select "raw" format and select "xml" or "json" from  dropdown as per requirement
+	
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+@Produces both XML and JSON Example
+
+    @GET
+    @Produces({MediaType.APPLICATION_XML,MediaType.APPLICATION_JSON})
+
+	XML Response:  In the postman client under "Headers" tab add parameter "Accept" --> "application/xml"  to get xml response.
+
+	JSON Response: In the postman client under "Headers" tab add parameter "Accept" --> "application/json" to get json response.
+	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------	

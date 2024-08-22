@@ -1,0 +1,143 @@
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+http://10.54.9.199:61002/NGAE/resources/services/SDWAN/?messageIdentifier=1302
+
+@GET
+	@Path("/SDWAN")
+	@Consumes({MediaType.TEXT_PLAIN})
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getTransactionStatus(@QueryParam("messageIdentifier") String messageIdentifier  ,	@HeaderParam("authorization") String authString) {
+      
+		   if(!isUserAuthenticated(authString)){
+	            String authUserResponse = "{\"error\":\"User not authenticated\"}";
+	    		return Response.status(HttpStatus.FAILURE).entity(authUserResponse).build();
+	        }
+		   
+		String response = null;
+		log.debug("Message Identifier is :::"+messageIdentifier);
+		try {
+			SDWANServiceUtil serviceUtil = new SDWANServiceUtil();
+			response = serviceUtil.getSDWANTransactionStatus(messageIdentifier);
+			return Response.status(HttpStatus.OK).entity(response).build();
+		} catch (Exception e) {
+			log.error("Error In Getting Status From SDWAN Transaction: - ");
+			log.error(e);
+			return Response.status(HttpStatus.OK).entity(response).build();
+
+		}
+
+    }
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+http://10.54.9.197:61002/NGAE/resources/services/SDWAN/
+
+sample JSON request for Post::
+
+{
+  "configRequest": {
+    "status": "Open",
+    "lastmodifieduser": "611911085",
+    "resourcemapping": "SDWAN",
+    "serviceid": "DCF011",
+    "header": {
+      "serviceType": "Generate Technical DCF",
+      "productName": "Connect Cisco SD-WAN",
+      "messageIdentifier": "9",
+      "orderType": "Provide"
+    },
+    "customerDetails": {
+      "customerName": "San475",
+      "customerId": "46200",
+      "salesChannel": "BT GERMANY"
+    },
+    "serviceDetails": [
+      {
+        "name": "VMANAGE URL",
+        "value": "https://vmanage-217798.viptela.net"
+      },
+      {
+        "name": "VBOND URL",
+        "value": "https://vbond-217798.viptela.net"
+      },
+      {
+        "name": "VMANAGE ADMIN USERID",
+        "value": "admin085"
+      },
+      {
+        "name": "SHAREPOINT URL",
+        "value": "https://office.bt.com/sites/CSPDOCTEST/CSPDOC/BT GERMANY/45001-50000/47500/Service Delivery"
+      }
+    ],
+    "userDetails": {
+      "userId": "611911085",
+      "userName": "SRIMS"
+    }
+  }
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+@POST
+	@Path("/SDWAN")
+	@Consumes({ MediaType.APPLICATION_JSON })
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response processDataFromSDWAN(InputStream incomingData  ,	@HeaderParam("authorization") String authString )   {
+
+        if(!isUserAuthenticated(authString)){
+            String authUserResponse = "{\"error\":\"User not authenticated\"}";
+    		return Response.status(HttpStatus.FAILURE).entity(authUserResponse).build();
+        }
+        
+		StringBuilder dataBuilder = new StringBuilder();
+		String result=null;
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(incomingData));
+			String line = null;
+			while ((line = in.readLine()) != null) {
+				dataBuilder.append(line);
+			}
+			SDWANServiceUtil serviceUtil = new SDWANServiceUtil();
+			result = serviceUtil.processJsonObject(dataBuilder.toString());
+		} catch (Exception e) {
+			log.error("Error Processing Data From SDWAN: - ");
+			return Response.status(HttpStatus.SUBMITTED).entity(result).build();
+		}
+		
+		return Response.status(HttpStatus.SUBMITTED).entity(result).build();
+	}	
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+private boolean isUserAuthenticated(String authString){
+		
+        boolean isUserAuthenticated = false;
+        String decodedAuth = "";
+        if(null == authString) {
+        	log.info("No header content/auth details");
+        	return false;
+        }
+        // Header is in the format "Basic 5tyc0uiDat4"
+        // We need to extract data before decoding it back to original string
+        String[] authParts = authString.split("\\s+");
+        String authInfo = authParts[1];
+        // Decode the data back to original string
+        /*
+		byte[] bytes = null;
+        try {
+            bytes = Base64.decodeBase64(authInfo);
+        } catch (Exception e) {
+            log.error("Unable To Decode");
+            e.printStackTrace();
+            return false;
+        }
+        decodedAuth = new String(bytes);
+		
+		*/
+		if ("T1NTU1JJTVM6T1NTU1JJTVMwbWU=".equals(authInfo)) {
+			log.info("User authenticated successfully");
+			isUserAuthenticated = true;
+		} else {
+			log.info("User authenticated failed");
+			isUserAuthenticated = false;
+		}
+		return isUserAuthenticated;
+    }
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------	

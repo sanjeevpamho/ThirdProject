@@ -1,0 +1,74 @@
+https://github.com/in28minutes/spring-microservices-v3/blob/main/03.microservices/step13.md
+----------------------------------------------------------------------------------------------------------------------------
+
+1.>SpringCloudConfigServerApplication
+
+
+
+@EnableConfigServer
+@SpringBootApplication
+public class SpringCloudConfigServerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SpringCloudConfigServerApplication.class, args);
+	}
+
+}
+------------------------------------------------------------------------------------
+application.properties
+
+spring.application.name=spring-cloud-config-server
+server.port=8888
+spring.cloud.config.server.git.uri=file:///in28Minutes/git/spring-microservices-v2/03.microservices/git-localconfig-repo
+#file:///C:/Users/home/Desktop/yourProject/git-repo
+
+---------------------------------------------------------------------------------------------------------------------------
+
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+</dependency>
+
+============================================================================================================================
+
+2.>limits-service
+
+2.1> application.properties
+
+spring.application.name=limits-service
+spring.config.import=optional:configserver:http://localhost:8888
+
+spring.profiles.active=qa
+spring.cloud.config.profile=qa
+
+#spring.cloud.config.name=
+
+limits-service.minimum=3
+limits-service.maximum=997
+------------------------------------------------------------------------------------------------------------------------
+2.2>
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+-----------------------------------------------------------------------------------
+2.3>public class Configuration
+
+@Component
+@ConfigurationProperties("limits-service")
+public class Configuration {
+	private int minimum;
+	private int maximum;
+------------------------------------------------------------------------------------
+lic class LimitsController {
+
+	@Autowired
+	private Configuration configuration;
+
+	@GetMapping("/limits")
+	public Limits retrieveLimits() {
+		return new Limits(configuration.getMinimum(), 
+				configuration.getMaximum());
+//		return new Limits(1,1000);
+	}
+}	

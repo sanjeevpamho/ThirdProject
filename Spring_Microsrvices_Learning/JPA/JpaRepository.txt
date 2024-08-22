@@ -1,0 +1,53 @@
+public interface CurrencyExchangeRepository extends JpaRepository<CurrencyExchange, Long> {}
+
+1.> findAll()
+2.>
+
+
+HashMap<String,String> uriVariables=new HashMap<>();
+
+ResponseEntity<CurrencyConversion> responseEntity=new RestTemplate().getForEntity("URL",CurrencyConversion.class,uriVariables);
+CurrencyConversion currencyConversion responseEntity.getBody();
+
+Feign
+
+package com.in28minutes.microservices.currencyconversionservice;
+
+import org.springframework.cloud.openfeign.FeignClient;
+
+@FeignClient(name="currency-exchange",url=)
+public interface CurrencyExchangeProxy{
+
+   @GetMapping("/currency-exchange/from/{from}/to/{to}"){
+     public CurrencyConversion retrieveExchangeValue(
+	   @PathVariable String from,
+	   @PathVariable String to);
+	 )
+   }
+}
+
+
+Eureka Naming Server (Load Balancer)
+
+
+
+package com.1n28minutes.microservices.apigateway;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApiGatewayConfiguration{
+ 
+ @Bean
+ public RouteLocator gatewayRouter(RouteLOcatorBuilder  builder){
+   return builder.routes()
+   .route(p-p.path("/currency-exchange/**")
+   .url("lb://currency-exchange")
+   )
+   .build();  
+ }
+ 
+}
+
+
+

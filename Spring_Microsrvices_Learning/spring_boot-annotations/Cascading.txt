@@ -1,0 +1,17 @@
+https://www.geeksforgeeks.org/hibernate-different-cascade-types/
+
+
+
+1. CascadeType.ALL
+2. CascadeType.PERSIST
+3. CascadeType.MERGE
+4. CascadeType.REMOVE
+@OneToMany(mappedBy="customer", cascade=CascadeType.REMOVE) 
+private Set<Order> orders;
+
+5. CascadeType.REFRESH
+6. CascadeType.DETACH
+7. CascadeType.REPLICATE
+8. CascadeType.SAVE_UPDATE
+
+         

@@ -1,0 +1,67 @@
+What is Hibernate N+1 Select Problem:
+N+1 select problem is a performance issue in hibernate.In this problem, a java application makes N+1 database calls(N=number of child object fetched). 
+For example if N=2 ,then application makes 3 (N+1 =3) database calls.
+here N is the number of rows of parent.
+
+Example - Employees and Departments have ManyToOne Relationship. 
+          One Department (Parent) can have multiple Employees (Child).
+		  
+	Department Table 
+    id    Name
+    1     Sales
+    2     Inventory	
+	
+    public class Department{
+	
+	 @Id
+	 @GeneratedId(strategy = GenerationType.AUTO or sequence or identity)
+	 private Long id;
+	 
+	 private String name;
+	
+     @OneToMany(fetch =FetchType.LAZY)
+	 @JoinColumn(name="Dept_id")
+	 List<Employee> listOfEmployees;
+
+    }	
+	
+ Now we need to fetch all departments.
+ 
+ So to fetch all the departments , one call will be hit to the database.
+ i.e, id and name from Department table.
+
+ now there will be 2 additional calls to the database to fetch listOfEmployees from Sales and Inventory department.
+ so if we would have 3 rows in department table then 4 Queries would have been triggered.
+ 
+ 
+ No of database calls performend are :
+ 1.>First call goes to Department table and fetch all departments (only id and name -> no employees list fetched)
+ 
+ 2.>Then while returning , for each department now a call goes to fetch list of employees.
+    So N calls goes now , each for 1 department.
+	
+	
+Solution:
+ 1.>At SQL level , what ORM needs to achieve to avoid N+1 is to fire a query that joins the two tables and get the combined results in single query.
+ 2.>Spring Data JPA Approach :
+    2.1>Using left join fetch - 
+	2.2>using attributePaths
+
+
+ public interface DepartmentCrudRepo extends JpaRepository<Department,Long>{
+  
+   @Query("Select p from Department p LEFT JOIN FETCH p.listOfEmployees")
+   List<Department> findWithoutNPlusOne();
+   
+   /* second approach using attribute path  which internally use left joins */
+   @EntityGraph(attributePaths = {"listOfEmployees"})
+   List<Department> findAll();
+ }
+	
+ 3.>Hibernate Approach hql
+    
+    Using HQL Query - "from Department d join fetch d.listOfEmployees Employee e"
+    it will be similar to sql query which we have written above.	
+	Using Criteria 
+	  Criteria criteria = session.createCriteria(Department.class);
+	  criteria.setFetchMode("listOfEmployees" , FetchMode.EAGER);

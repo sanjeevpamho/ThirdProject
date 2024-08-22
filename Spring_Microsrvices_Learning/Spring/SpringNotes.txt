@@ -1,0 +1,810 @@
+https://www.gontu.org/downloads-tutorials/
+
+SPRING Framework.
+
+1.>Dependency Injection or IOP::
+Do not create or instantiate an object inside another java class.
+Instead rely on Spring's IOPmodule to create the object for you
+=====================================================================================================
+2.>Aspect Oriented Programming::
+DO not mix non-business logic with actual business logic in our classes
+
+ex:
+public class Calculator
+{
+ private int addition;
+ public boolean addition(int a, int b){
+   logger.info("enter into method");
+   
+   try{
+   addition=a+b;                          /* mixing both functional and non-functional logic */
+   }
+   catch(Exception e){
+   logger.error("Error occured");
+   }
+   logger.info("Exiting from method");
+   
+   return addition;
+   
+ }
+}
+======================================================================================================
+3.>Data Access/Integration-contains 5 sub modules in it ..JDBC,ORM,OXM,JMS,Transaction Management
+======================================================================================================
+1.>Dependency Injection or IOP::
+Tightly Coupled.
+
+class Restaurant{                        
+ Tea tea=new Tea();
+ public void prepareHotDrink(){
+    tea.prepareHotDrink();
+ }
+}
+
+class Tea{
+ public void prepareHotDrink(){
+ //some code
+ };
+}
+
+1.>In future we can't replace Tea with Express because of Tightly coupled.
+If we do,will take lot of developer effort.
+2.>We can't test Restaurant class without Tea.
+
+So Dependency Injection can  help in  solving this issue.
+
+Outsource the task of handling all dependencies of an object to an Expert(Some third party Programmer)
+
+In order to this we can use Interface.
+interface IHotDrink{
+public void prepareHotDrink();
+}
+
+
+Note:Spring framework provides 2 ways of DI:
+1.>Using the constructor ways
+2.>Using the setter method way.
+
+
+=========================================================
+org.springframework.beans.factory.xml.XmlBeanFactory
+org.springframework.context.ApplicationContext
+
+
+0) BeanFactory: is the actual container which instantiates, configures, and manages a number of beans.
+  A BeanFactory is represented by the interface org.springframework.beans.factory.BeanFactory, for which there are multiple implementations. 
+  The most commonly used simple BeanFactory implementation is org.springframework.beans.factory.xml.XmlBeanFactory.
+  
+  BeanFactory can still be used for lightweight applications like mobile devices or applet-based applications.
+  
+  Example:XmlBeanFactory factory = new XmlBeanFactory (new ClassPathResource("Beans.xml")); 
+          HelloWorld obj = (HelloWorld) factory.getBean("helloWorld"); 
+		  
+0)Application Context:
+ Spring's advanced container. Similar to BeanFactory, it can load bean definitions, wire beans together, and dispense beans upon request. 
+ Additionally, it adds more enterprise-specific functionality such as the ability to resolve textual messages from a properties file 
+ and the ability to publish application events to interested event listeners. 
+ This container is defined by org.springframework.context.ApplicationContext interface.	
+
+The most commonly used ApplicationContext implementations:
+--FileSystemXmlApplicationContext
+--ClassPathXmlApplicationContext
+--WebXmlApplicationContext-This container loads the XML file with definitions of all beans from within a web application. 
+
+
+DIFFERENCE BETWEEN BeanFactory and ApplicationContext
+
+BeanFactory	                                                                 ApplicationContext
+1.>BeanFactory is also called basic IOC	                                     1.>ApplicationContext is called Advanced IOC
+2.>BeanFactory uses lazy initialization approach	                         2.>ApplicationContext uses eager initialization approach
+3.>BeanFactory creates a singleton bean only when it is requested from it	 3.>ApplicationContext creates all singleton beans at the time of its own initialization
+4.>Annotation based dependency Injection is not supported by BeanFactory	 4.>ApplicationContext supports using annotation @PreDestroy, @Autowired
+5.>"There are some limited situations, such as in mobile applications,       5.>"However, in most enterprise applications, the ApplicationContext is what you will want to use"
+ where memory consumption might be critical.
+ In those scenarios, it would be justifiable to use the 
+ more lightweight BeanFactory"	
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Here is the content of HelloWorld.java file −
+
+package com.tutorialspoint;
+
+public class HelloWorld {
+   private String message;
+
+   public void setMessage(String message){
+      this.message  = message;
+   }
+   public void getMessage(){
+      System.out.println("Your Message : " + message);
+   }
+}
+Following is the content of the second file MainApp.java −
+
+package com.tutorialspoint;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("Beans.xml");
+      HelloWorld obj = (HelloWorld) context.getBean("helloWorld");
+      obj.getMessage();
+   }
+}
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id = "helloWorld" class = "com.tutorialspoint.HelloWorld">
+      <property name = "message" value = "Hello World!"/>
+   </bean>
+
+</beans>
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+package org.gontuseries.springcore;
+
+public class Restaurant {
+   
+   public void greetCustomer(){
+      System.out.println("Welcome to restaruant !!!");
+   }
+}
+Following is the content of the second file MainApp.java −
+
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+      Restaurant restaurantObj = (Restaurant) context.getBean("restaruantBean");
+      restaurantObj.greetCustomer();
+   }
+}
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id = "restaurantObj" class = "org.gontuseries.springcore.Restaurant">
+     
+   </bean>
+
+</beans>
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Demo by   setting property value
+
+package org.gontuseries.springcore;
+
+public class Restaurant {
+   String welcomeNote;
+   public void setWelcoeNote(String welcomeNote){
+     this.welcomeNote=welcomeNote;
+   }
+   public void greetCustomer(){
+      System.out.println(welcomeNote);
+   }
+}
+
+
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+      Restaurant restaurantObj = (Restaurant) context.getBean("restaruantBean");
+      restaurantObj.greetCustomer();
+   }
+}
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id = "restaurantObj" class = "org.gontuseries.springcore.Restaurant">   
+	 <property nmae="welcomeNote" value="welcome to our restaruant!!!"/>
+   </bean>
+
+</beans>
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Demo by   setting via Constructor way
+
+package org.gontuseries.springcore;
+public interface IHotDrink{
+
+ public void prepareHotDrink();
+}
+
+package org.gontuseries.springcore;
+public class Tea implements IHotDrink{
+  public void prepareHotDrink(){
+    System.out.println("Dear customer,we are ppreparig hot tea for you");
+  }
+}
+
+package org.gontuseries.springcore;
+
+public class Restaurant {
+   
+   IHotDrink hotDrink;
+   Restaurant(IHotDrink hotDrink){
+     this.hotDrink=hotDrink;
+   }
+   public void prepareHotDrink(){
+    hotDrink.prepareHotDrink();
+  }
+}
+
+
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+      Restaurant restaurantObj = (Restaurant) context.getBean("restaruantBean");
+      restaurantObj.prepareHotDrink();
+   }
+}
+
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id = "restaurantObj" class = "org.gontuseries.springcore.Restaurant">   
+	 <constructor-arg ref="teaBean" />
+   </bean>
+   <bean id="teaBean" class="org.gontuseries.springcore.Tea" />
+
+</beans>
+
+
+++++++++++++++++++++++++++++++++++
+DI demo using setter method way
+
+package org.gontuseries.springcore;
+public interface IHotDrink{
+
+ public void prepareHotDrink();
+}
+
+package org.gontuseries.springcore;
+public class Tea implements IHotDrink{
+  public void prepareHotDrink(){
+    System.out.println("Dear customer,we are ppreparig hot tea for you");
+  }
+}
+
+package org.gontuseries.springcore;
+
+public class Restaurant {
+   
+   IHotDrink hotDrink;
+  public void  sethotDrink(IHotDrink hotDrink){
+     this.hotDrink=hotDrink;
+   }
+   public void prepareHotDrink(){
+    hotDrink.prepareHotDrink();
+  }
+}
+
+
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+      Restaurant restaurantObj = (Restaurant) context.getBean("restaruantBean");
+      restaurantObj.prepareHotDrink();
+   }
+}
+
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id = "restaurantObj" class = "org.gontuseries.springcore.Restaurant">   
+	 <property name="hotDrink"  ref="teaBean"/>
+   </bean>
+   <bean id="teaBean" class="org.gontuseries.springcore.Tea" />
+
+</beans>
+  
+  
+++++++++++++++++++++++++++++++++++++++++++++
+DI using collection property
+
+--how to provide value of a java collection from Spring's configurtion file?
+
+steps:just declare a collection with  a setter method in the java class and provide its value in the spring's 
+      configuration file.
+  
+ package org.gontuseries.springcore;
+import java.util.List;
+public class Restaurant {
+
+	private List restaruantWaitersList;
+	public void setRestaruantWaitersList(List restaruantWaitersList) {
+		this.restaruantWaitersList = restaruantWaitersList;
+	}
+	public void displayWaitersNames() {
+
+		System.out.println("All waiters working in Restaruant  :  " + restaruantWaitersList);
+	}
+
+} 
+  
+  
+<beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+  <bean class="org.gontuseries.springcore.Restaurant" id="restaurantBean">
+    <property name="restaruantWaitersList">
+     <list>
+      <value>Mr. ABC</value>
+      <value>Mr. BCD</value>
+      <value>Mr. DEF</value>
+      <value>Mr. DEF</value>
+     </list>
+    </property>
+  </bean>
+
+</beans>
+
+-----------------------------
+/*   Example to pass Map 
+
+<property name="myMap">
+  <map>
+    <entry key="1"  value="Sam" />
+	<entry key="2"  value="Karan" />
+	<entry key="3"  value="Rashid" />
+	</map>
+</property>	
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Spring's Bean Scope:
+
+we can provide the scope of bean in the Spring's configuration file using scope attribute with each bean definition.
+
+different bean scope::
+1.> prototype -a new instance every time bean is requested.
+2.> singleton -Only 1 instance of bean per spring container[default]
+3.> request-Single bean instance per http request
+4.> session -Single bean instance per http sesssion
+5.> global-session - Single bean instance per global http sesssion
+example
+<bean class="org.gontuseries.springcore.Restaurant" id="restaurantBean" scope="singleton" />
+
+-----------------demo-------------
+
+package org.gontuseries.springcore;
+public class Restaurant {
+
+	private String welcomeNote;
+	public void setWelcomeNote(String welcomeNote) {
+
+		this.welcomeNote = welcomeNote;
+	}
+	public void greetCustomer() {
+
+		System.out.println(welcomeNote);
+	}
+}
+------------------------------------------------------------------------------------------
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestSpringProject {
+
+	public static void main(String[] args) {
+
+		ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+
+		Restaurant restaruantObj1 = (Restaurant) context.getBean("restaurantBean");
+		restaruantObj1.setWelcomeNote("Object1 is setting welcome note properrty");
+		restaruantObj1.greetCustomer();
+
+		Restaurant restaurantObj = (Restaurant) context.getBean("restaurantBean");
+		restaurantObj.greetCustomer();
+
+	}
+}
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+  <bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" scope="prototype"> </bean>
+</beans>
+
++++++++++++++++++++++++++++++++++++++++++++++
+Lazy and Eager loading of a bean 
+
+if we don't want to load the bean at application startup then we can use lazy loading.
+
+Note::In BeanFactory interface there is no concept of pre-loading or Eager loading.
+
+  <bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" scope="singleton" lazy-init="true" > </bean>
+  
++++++++++++++++++++++++++++++++++++++++++++++
+Bean Life Cycle
+
+1st approach - using init and destroy method
+
+init()-spring will get execute this method just after bean instantiate
+destroy()-spring will get execute  this method just before it destroy the bean
+
+demo::
+package org.gontuseries.springcore;
+
+public class Restaurant {
+
+	public void greetCustomer() {
+
+		System.out.println("welcome dear customer!! this is the LifeCycle demo");
+	}
+	
+	public void init() {
+		System.out.println("Restaurant Bean is going through init.");
+	}
+
+	public void destroy() {
+		System.out.println("Bean will destroy now.");
+	}
+
+}
+
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestSpringProject {
+
+	public static void main(String[] args) {
+
+		ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+		
+		((AbstractApplicationContext)context).registerShutdownHook();
+		
+		Restaurant restaurantObj = (Restaurant) context.getBean("restaurantBean");
+		restaurantObj.greetCustomer();
+
+	}
+}
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+<bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" init-method="init" destroy-method="destroy"> </bean>
+</beans>
+
+<!-- we can set them  default as well so that applicable for all beans
+default-init-method="init" default-destroy-method="destroy"
+-->
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+2nd Approach - Using Annotations (PostConstruct,PreDestroy)
+
+package org.gontuseries.springcore;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+public class Restaurant {
+	public void greetCustomer() {
+		System.out.println("Welcome dear customer!! This is the LifeCyce demo");
+	}
+	@PostConstruct
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("Restaruant Bean is going through afterPropertiesSet");
+	}
+	@PreDestroy
+	public void destroy() throws Exception {
+		System.out.println("Restaruant Bean is destroying now");
+	}
+}
+
+----------------------------------------------------------------------------------------------------------
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" >
+	</bean>
+	
+	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" >
+	<!--This post-processor declaration is  provided just to know spring framework to enable the above annotations i.e, PostConstruct,PreDestroy 
+	This post-processor includes support for the PostConstruct and PreDestroy annotations - as init annotation and destroy annotation
+	-->
+	</bean>
+
+</beans>
+-----------------------------------------------------------------------------------------------------------
+package org.gontuseries.springcore;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestSpringProject {
+
+	public static void main(String[] args) {
+
+		ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+		
+		((AbstractApplicationContext)context).registerShutdownHook();
+		
+		Restaurant restaurantObj = (Restaurant) context.getBean("restaurantBean");
+		restaurantObj.greetCustomer();
+
+	}
+}
+--------------------------------------------------------------------------------------------------------------------
+3rd Approach - By implementing methods in InitializingBean and DisposableBean interfaces
+
+
+package org.gontuseries.springcore;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+
+public class Restaurant implements InitializingBean,DisposableBean{
+	public void greetCustomer() {
+		System.out.println("Welcome dear customer!! This is the LifeCyce demo");
+	}
+	public void afterPropertiesSet() throws Exception {
+	  System.out.println("RestaurantBean is going through afterPropertiesSet");
+	}
+	
+	public void destroy() throws Exception {
+	  System.out.println("RestaurantBean is destroying now...");
+	}
+}
+
+===============================================================================================================================================================
+-->>A BeanPostProcessor concept in Spring
+
+
+package org.gontuseries.springcore;
+public class Restaurant {
+	public void greetCustomer() {
+		System.out.println("Welcome dear customer!! This is the LifeCyce demo");
+	}
+	public void init() {
+		System.out.println("Bean is going through init.");
+	}
+	public void destroy() {
+		System.out.println("Bean is getting destroyed.");
+	}
+}
+-----------------------------------------------------------------------------------------------------------
+
+package org.gontuseries.springcore;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
+
+public class DemoBeanPostProcessor implements BeanPostProcessor {
+		public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
+		System.out.println("processing bean instance after initialization ( i.e just after init life cycle event ) of: " + beanName);
+		return bean;
+	}
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
+				System.out.println("processing bean instance before initialization ( i.e after spring instantiates bean and before init life cycle event ) of: " + beanName);
+		return bean;
+	}
+}
+-------------------------------------------------------------------------------------------------------------------------
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" init-method="init" destroy-method="destroy"></bean>
+<bean class="org.gontuseries.springcore.DemoBeanPostProcessor"></bean>
+</beans>
+
+==================================================================================================================================================================
+-->>Implementing an Ordered interface in a BeanPostProcessor class
+Note::value =0 means highest priority
+
+
+package org.gontuseries.springcore;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
+public class DemoBeanPostProcessor1 implements BeanPostProcessor, Ordered {
+	int order;
+		public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
+		System.out.println("DemoBeanPostProcessor1 processing bean instance after initialization ( i.e just after init life cycle event ) of: " + beanName);
+		return bean;
+	}
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {	
+		System.out.println("DemoBeanPostProcessor1 processing bean instance before initialization ( i.e after spring instantiates bean and before init life cycle event ) of: " + beanName);
+		return bean;
+	}
+	public void setOrder(int order) {
+		this.order = order;
+	}
+	@Override
+	public int getOrder() {	
+		return order;
+	}
+}
+-----------------------------------------------------
+package org.gontuseries.springcore;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
+
+public class DemoBeanPostProcessor2 implements BeanPostProcessor, Ordered {
+    int order;
+	public Object postProcessAfterInitialization(Object bean, String beanName)
+			throws BeansException {
+		System.out.println("DemoBeanPostProcessor2 processing bean instance after initialization ( i.e just after init life cycle event ) of: " + beanName);
+		return bean;
+	}
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {	
+		System.out.println("DemoBeanPostProcessor2 processing bean instance before initialization ( i.e after spring instantiates bean and before init life cycle event ) of: " + beanName);
+		return bean;
+	}
+	public void setOrder(int order) {
+		this.order = order;
+	}
+	@Override
+	public int getOrder() {	
+		return order;
+	}
+}
+---------------------------------------------------------
+package org.gontuseries.springcore;
+public class Restaurant {
+	public void greetCustomer() {
+		System.out.println("Welcome dear customer!! This is the LifeCyce demo");
+	}
+	public void init() {
+		System.out.println("Bean is going through init.");
+	}
+	public void destroy() {
+		System.out.println("Bean is getting destroyed.");
+	}
+}
+---------------------------------------------------------
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant" init-method="init" destroy-method="destroy">
+	</bean>
+		<bean class="org.gontuseries.springcore.DemoBeanPostProcessor1">
+		<property name="order" value="1" />
+	</bean>
+	<bean class="org.gontuseries.springcore.DemoBeanPostProcessor2">
+		<property name="order" value="0" />   
+	</bean>
+
+</beans>
+-----------------------------------------------------------------------
+package org.gontuseries.springcore;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+public class TestSpringProject {
+	public static void main(String[] args) {
+		ApplicationContext context = new ClassPathXmlApplicationContext("SpringConfig.xml");		
+		((AbstractApplicationContext)context).registerShutdownHook();		
+		Restaurant restaurantObj = (Restaurant) context.getBean("restaurantBean");
+		restaurantObj.greetCustomer();
+	}
+}
+=======================================================================================================================================
+--->>A BeanFactoryPostProcessor concept in spring
+
+package org.gontuseries.springcore;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+public class DemoBeanFactoryPostProcessor implements BeanFactoryPostProcessor{
+	@Override
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+			throws BeansException {
+		BeanDefinition beanDefinition = beanFactory.getBeanDefinition("restaurantBean");
+		MutablePropertyValues propertyValues = beanDefinition.getPropertyValues();		
+		propertyValues.addPropertyValue("welcomeNote", "This is the modified welcomeNote value using BeanFactoryPostProcessor");					
+	}
+}
+--------------------------------------------------------------
+package org.gontuseries.springcore;
+
+public class Restaurant {
+	String welcomeNote;	
+	public void setWelcomeNote(String welcomeNote) {	
+		this.welcomeNote = welcomeNote;
+	}	
+	public void greetCustomer() {
+		System.out.println(welcomeNote);
+	}
+}
+--------------------------------------------------------------
+package org.gontuseries.springcore;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class TestSpringProject {
+
+	public static void main(String[] args) {
+		
+		ApplicationContext context =
+				new ClassPathXmlApplicationContext("SpringConfig.xml");
+
+		Restaurant restaurantObj = (Restaurant) context.getBean("restaurantBean");
+		restaurantObj.greetCustomer();
+	}
+
+}
+---------------------------------------------------------------
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<bean id="restaurantBean" class="org.gontuseries.springcore.Restaurant">
+		<property name="welcomeNote" value="Hi and welcome to our Restaurant"></property>
+	</bean>
+
+	<bean class="org.gontuseries.springcore.DemoBeanFactoryPostProcessor" >
+	</bean>
+
+
+</beans>
+-----------------------------------------------------------------------------------------
+--->>>Using PropertyPlaceHolderConfigurer
+

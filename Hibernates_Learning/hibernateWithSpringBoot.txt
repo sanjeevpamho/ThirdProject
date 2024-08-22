@@ -1,0 +1,64 @@
+1.>Important Interfaces used in hibernate
+   SessionFactory:
+   Session:
+   Transaction
+   PersistenceContext
+ 
+================================================================================================================== 
+2.>Difference Between openSession and getCurrentSession
+
+  openSession() method helps in opening a new session.
+  you should close the session object once you are done with all the database operations.
+  And also, you should open a new session for each request in a multi-threaded environment.
+
+  getCurrentSession  : method returns the session bound to the context.
+                       since this session object belongs to the context of hibernate,it is 
+					   okay if you don't close it.Once the SessionFactory is closed, this
+					   session object gets closed.
+
+===================================================================================================================
+					   
+3.>difference between session get() and load()
+
+get():
+1.>loads the data as soon as called
+2.>we should use get() method when we want to make sure data exists in the database.
+
+load():
+1.>load() method returns a proxy object and loads data only when it's actually required.So load is better 
+   because it supports lazy loading.
+2.>load() method throws exception when data is not found.We should use it only when we know data exists.  
+
+====================================================================================================================
+4.> 
+spring.datasource.url=
+spring.datasource.username=root
+spring.datasource.password=
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+#to enale sql log
+spring.jpa.show-sql=true
+====================================================================================================================
+5.>@Transactional annoatation
+
+@Autowired
+private AddressService addressService;
+
+
+@Transactional
+public Employee addEmployee(Employee employee) throws Exception{
+ Employee savedEmployee = curdRepo.save(employee);
+ if(savedEmployee.getName().contains("code")){
+  throw new Exception();
+ }
+ Address address = new Address();
+ address.setId(1L);
+ address.setName("Whitefield");
+ address.setEmp(employee);
+ addressService.addAddressToo(address);
+ return savedEmployee;
+}
+
+when all the lines of the method will executes then only data will gets update in database.
+@Transactional annoatation opens a physical transaction to the database.and update to the database when all the lines will be executed.
+   
+					   

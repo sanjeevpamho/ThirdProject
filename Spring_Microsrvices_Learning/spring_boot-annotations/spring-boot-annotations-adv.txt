@@ -1,0 +1,891 @@
+5All the URL:
+http://localhost:8888/limits-service/dev
+http://localhost:8080/limits
+http://localhost:8000/currency-exchange/from/USD/to/INR
+http://localhost:8002/currency-exchange/from/USD/to/INR
+http://localhost:8100/currency-convertor/from/USD/to/INR/quantity/1000
+http://localhost:8100/currency-convertor-feign/from/USD/to/INR/quantity/1000
+http://localhost:8761/
+
+Http requests are stateless requests.
+-------------------------------------
+https://github.com/in28minutes?tab=repositories
+https://github.com/in28minutes/spring-microservices/tree/master/
+https://github.com/in28minutes/spring-microservices/tree/master/03.microservices
+-------------------------------------------
+Spring Boot:Spring boot is a tool which helps us in create Spring based applications.
+            Spring Boot makes it easy to create stand alone , production - grade Spring based applications that we can "just run" .
+            
+Spring Boot helps us to do RAD (Rapid Application Development)			
+Spring boot is stand alone.No need to deploy on tomcat container
+
+=====================================================================================
+bill of materials in spring boot:
+
+<parent>  attributes provides configuration and inform maven what jars to pull when we do specify dependency.
+          basically dependency section informs what jars needs to download and parent section informs about the version.
+		  This pre set list of possible combinations of jars that work well without issues is called bill of materials.
+</parent>
+=====================================================================================
+Ways to create spring boot application:
+1.>STS (Spring Tool Suite) IDE 
+2.>start.spring.io
+3.>Spring Boot CLI
+-------------------------------------------------------------------------------------
+=======================================================================================================================
+Annotations to start Spring Based Application:
+
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+}
+
+@ComponentScan,@Configuration and @EnableAutoConfiguration are clubbed into 1 annotation i.e,  @SpringBootApplication
+========================================================================================================================
+6.1>@ComponentScan - By default spring framework scans all the beans/components  in our current package (containing main class) and its sub packages.
+
+When we have bean in a different package and haven't told Spring to scan explicitly or whenever Spring couldn't recognize a particular bean.
+Then we have to use @Component for that class in that particular package.
+
+@Component
+public class ComponentScanTest
+{
+   public void hello(){
+      syso("Hello");
+   }
+}
+
+and to recognize spring framwork ComponentScanTest bean under our main package . we have to use @ComponentScan wrt to base package explicitly.
+
+@ComponentScan({"com.Sanjeev.MainPackage","com.Sanjeev.TemporaryPackage"})
+@SpringBootApplication
+===============================================================================================================================
+
+Starting Spring Boot:
+1.>load default configuration
+2.>Starts Spring Application Context
+3.>Performs class path scan
+4.>Starts Tomcat Server
+--------------------------------------------------------------------------------------
+
+3.>@RestController is used to create RESTful web services using spring.
+           @RestController is a a special controller used in RESTful web services and is equal to 
+		   Spring MVC 
+		   @Controller +  @ResponseBody
+  
+--------------------------------------------------------------------------------------  
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+=========================================================================================
+add header Accept with value application/xml  in 
+postman to see data in XML format.
+=========================================================================================
+
+@PostMapping(
+        consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
+        produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }
+)
+
+@RequestMapping(value="/tutorials/{id}", produces=MediaType.APPLICATION_XML_VALUE)
+produces = { "application/json", "application/xml" }
+4.>URL mapping in Spring Boot
+
+    @GetMapping(path="/users")
+   @RequestMapping(method=RequestMethod.GET,value="/users")
+   
+  -->> syntax for handling Path Variable: 
+   @RequestMapping( method=RequestMethod.GET, value="/students/{studentId}/courses/{courseId}")	
+    public Course retrieveDetailsForCourse(@PathVariable String studentId,@PathVariable String courseId) {
+		return studentService.retrieveCourse(studentId, courseId);
+	}
+   
+   
+    -->> syntax for handling Query Variable:  /welcome/user?profile=Sanjeev
+    @RequestMapping(method=RequestMethod.GET,value="/welcome/user")
+    @ResponseBody
+    public Welcome welcomeUser(@RequestParam(name="profile", required=false, defaultValue="Java Fan") String name) {
+        return new Welcome(String.format(welcomemsg, name));
+    }
+    -->> syntax for Post request
+    @PostMapping("/jpa/users")
+	public ResponseEntity<Object> createUser(@Valid @RequestBody User user)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+   Dispatcher Servlet :
+   All the mapping is internally handled in Spring Boot by dispatcher Servlet.
+   Dispatcher Servlet handles an incoming HTTPRequest,delegates the request and processes that request according to the configured HandlerAdapter
+   Auto configuration report
+--------------------------------------------------------------------------------------
+5.>  
+   Spring @Service annotation is used with classes that provide some service or some business functionalities. 
+   Spring context will autodetect these classes when annotation-based configuration and classpath scanning is used.
+   
+   In our example: our service class i.e,CourseService is providing functionalities.
+---------------------------------------------------------------------------------------   
+
+
+6.>@Component --By labbeling class with @Component . we add the class in the application context. or registring the class with application context.
+                Spring framework will autodetect these classes for dependency injection when annotation-based configuration and classpath scanning is used.
+				We want spring to manage this class
+
+
+@Component
+public class NewBornBabyService{
+  public String getBabyName(){
+     return "Jigy";
+  }
+} 
+
+Now we can use this bean around anywhere in our application
+using @Autowired
+---------------------------------------------------------------------------------------
+The Application Context is Spring's advanced container. Similar to BeanFactory, it can load bean definitions, wire beans together, and dispense beans upon request. 
+---------------------------
+on start-up ,spring creates application context.This is the object that stores all these dependencies so they can 
+                     be wired into the application when they are needed.Spring refers these dependencies as beans.
+					
+---------------------------------------------------------------------------------------
+Annotation	Meaning
+@Component	generic stereotype for any Spring-managed component.this annotations job is to only make a class visible to the auto scanning of Spring Boot. 
+            We can use @Component across the application to mark the beans as Spring’s managed components.
+@Repository	@Repository Annotation is also a specialization of @Component annotation.stereotype for persistence layer
+@Service	 It is a specialization of @Component Annotation.stereotype for service layer . We mark beans with @Service to indicate that they’re holding the business logic. 
+@Controller	@Controller annotation is also a specialization of @Component annotation. stereotype for presentation layer (spring-mvc)
+
+The major difference between these stereotypes is that they are used for different classifications. 
+---------------------------------------------------------------------------------------
+Spring Boot Starter Actuator - monitor and manage application in production
+ It provides a number of endpoints:
+  1.>Beans : Complete list of Spring beans in our application
+  2.>Health : Application health information
+  3.>metrics : Application metrics
+  4.>Mappings : Details around request mappings
+  
+  localhost:8080/actuator
+  
+  add below in application.properties to have more feature
+  management.endpoints.web.exposure.include=*
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+6.2>@Configuration - Spring @Configuration annotation is part of the spring core framework. 
+					 Spring Configuration annotation indicates that the class has @Bean definition methods. 
+					 So Spring container can process the class and generate Spring Beans to be used in the application.
+					 
+package com.journaldev.spring;
+public class MyBean {
+
+	public MyBean() {
+		System.out.println("MyBean instance created");
+	}
+	
+}
+package com.journaldev.spring;
+@Configuration
+public class MyConfiguration {
+
+    @Bean
+    public MyBean myBean() {
+		return new MyBean();
+	}
+	
+}
+An important point to note that This Configuration class informs Spring to create a new MyBean object and 
+@Bean annotation informs Spring to add the returned	class to the ApplicationContext				 
+===============================================================================================================================
+7.>@Autowired=creates the instance of the class for the application. or autowiring feature of spring framework enables us to 
+   inject the object dependency implicitly.
+   @Autowired annotation is used for dependency injection.
+---------------------------------------------------------------------------------------
+8.>@ResponseStatus(HttpStatus.NOT_FOUND)
+public class UserNotFoundException extends RuntimeException {
+---------------------------------------------------------------------------------------
+9.>@ControllerAdvice -@ControllerAdvice is an annotation provided by Spring allowing you to write global code that 
+                     can be applied to a wide range of controllers — varying from all controllers 
+					 to a chosen package or even a specific annotation. 
+					
+					 we will focus on handling exceptions using @ControllerAdvice and @ExceptionHandler
+		===========================================================================			 
+		Example::
+          		@ControllerAdvice
+                @RestController
+                @ExceptionHandler(UserNotFoundException.class)
+		===========================================================================			
+----------------------------------------------------------------------------------------
+10.>@ExceptionHandler-
+
+@ControllerAdvice
+public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
+    @ExceptionHandler(Exception.class)	
+	public final ResponseEntity<Object> handleAllExceptions(Exception ex,WebRequest request){
+		ExceptionResponse exceptionResponse=new ExceptionResponse
+				(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity(exceptionResponse,HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	@ExceptionHandler(UserNotFoundException.class)	
+	public final ResponseEntity<Object> handleUserNotFoundException(Exception ex,WebRequest request){
+		ExceptionResponse exceptionResponse=new ExceptionResponse
+				(new Date(), ex.getMessage(), request.getDescription(false));
+		return new ResponseEntity(exceptionResponse,HttpStatus.NOT_FOUND);
+	}
+}	
+-------------------------------------------------------------------------------------------	
+11.> @Valid
+-------------------------------------------------------------------------------------------
+Versioning 
+-------------------------------------------------------------------------------------------
+12.>HATEOAS:Hypermedia As The Engine Of Application State (HATEOAS) 
+             is a component of the REST application architecture that distinguishes it from other network application architectures.
+
+when retrieve user is called for a particular user, along with returning user details , a link will be returned to get other user objects. 
+
+Resource<User> resource=new Resource<User>(user);
+
+ControllerLinkBuilder linkTo =
+              linkTo(methodOn(this.getClass()).retrieveAllUsers());
+
+resource.add(linkTo.withRel("all-users"));			  
+return resource;
+-------------------------------------------------------------------------------------------
+
+13.>Internationalization- is customization our services for different people around the world.
+  
+  for this we have to use LocaleResolver bean, ResourceBundleMessageSource in @SpringBootApplication.
+  and need to define spring.messages.basename=messages in annotation.properties.
+-------------------------------------------------------------------------------------------------------  
+14.>  Content Negotiation: use below dependency for xml support.
+
+        <dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
+------------------------------------------------------------------------------------------------------
+15.>Configuring Auto Generation of Swagger Documentation:
+
+Swagger is a popular documentation tool for restful web services.
+------------------------------------------------------------------------------------------------------
+JPA
+Connecting API to database
+
+public interface UserRepository extends JpaRepository<User, Integer> {
+
+ syntax for native and hql queries
+   @Query("Select p from Department p LEFT JOIN FETCH p.listOfEmployees")
+   List<Department> findWithoutNPlusOne();
+}
+
+
+-------------------------------------------------------------------------------------------------------
+16.>spring-boot-starter-actuator:it provides lot of monitoring facilities around our services
+  
+<!-- for monitoring services start -->
+		<!-- HAL means Hypertext Application Language -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-rest-hal-browser</artifactId>
+		</dependency>
+		<!-- for monitoring services finish -->
+	</dependencies>
+	
+------
+URL: localhost:8080/actuator
+===============================================================================
+17.>Filtering- Spring boot provides the facility of filtering the content. 
+               Suppose few fields in our response have sensitive data and 
+			   we don't want to return that.
+			   Then Spring boot alolows to restrict the same.	
+			   
+17.1>Static Filtering:			   
+--------------------
+->1st approcah
+@JsonIgnore
+private String field
+--------------------
+->2nd approcah
+
+@JsonIgnoreProperties(value={"field1","field2"})
+===============================================================================
+17.2>Dynamic Filtering:
+
+===============================================================================
+18.>Versioning of the API-
+   Variety of Options:
+   1.>URI / URL
+   2.>Request Parameter
+   3.>Header
+   4.>Media Type
+   
+   1.>URI Versioning - Twitter :
+      @GetMapping("/v1/person")
+	  
+	  @GetMapping("/v2/person")
+	  
+   2.>Request Parameter Versioning - Amazon :
+      http://localhost:8080/person?version=1
+	  http://localhost:8080/person?version=2
+	  
+	  @GetMapping(path = "/person" , params = "version=1")
+	  
+   3.>Custom Headers Versioning - Microsoft :
+      Same URL headers = [X-API-VERSION=1]
+	  Same URL headers = [X-API-VERSION=2]
+	  
+	  @GetMapping(path = "/person/header" , headers = "X-API-VERSION=1")
+   
+   4.>Media Type Versioning - Github :
+      content Negotiation or accept header
+      
+	  @GetMapping(path = "/person/accept" , produces = "application/vnd.company.app-v1+json")
+   
+   
+===============================================================================
+https://springframework.guru/implementing-http-basic-authentication-in-a-spring-boot-rest-api/
+
+19.>Authentication with Spring Security:
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+===============================================================================
+20.>   Spring Data JPA:
+
+public interface ExchangeValueRepository extends JpaRepository<ExchangeValue, Long>
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+       
+	   <dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+for accessing DB:
+http://localhost:8080/h2-console
+
+jdbc url should be: jdbc:h2:mem:testdb
+==========================================================================================================================
+UserRepository userRepository methods : 
+1.>userRepository.findAll();
+2.>userRepository.findById(id)
+3.>userRepository.deleteById(id);
+4.>userRepository.save(user);
+5.>Optional<User> user = userRepository.findById(id);
+   user.get().getPosts();
+6.>postRepository.save(post);   
+
+7.>findByFromAndTo(String from, String to);
+
+==========================================================================================================================
+@compatible @async
+==========================================================================================================================
+1.>Bean:A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container.
+.>Spring IOC Containers-(Bean Factory and Application Context)
+
+  Spring IOC container is the central management system of the Spring Framework. 
+  It is responsible to create, configure and manage the life cycle of these objects.
+  The container gets its instructions on what objects to instantiate, configure, 
+  and assemble by reading configuration metadata provided in the form of either XML configurations or annotations
+  
+               or
+  IoC for short, is a process in which an object defines its dependencies without creating them. 
+  This object delegates the job of constructing such dependencies to an IoC container.	
+
+========================
+Configuration metadata:
+the Spring IoC container consumes a form of configuration metadata; this configuration metadata represents how you as an application developer tell the Spring container to instantiate, configure, and assemble the objects in your application.
+
+Annotation-based configuration: Spring 2.5 introduced support for annotation-based configuration metadata.
+Java-based configuration:
+
+Instantiating a container:
+Instantiating a Spring IoC container is straightforward. The location path or paths supplied to an ApplicationContext constructor are actually resource strings that allow the container to load configuration metadata from a variety of external resources such as the local file system, from the Java CLASSPATH, and so on.
+
+ApplicationContext context =
+    new ClassPathXmlApplicationContext(new String[] {"services.xml", "daos.xml"});
+  
+.>Spring autowired feature enables injection of the object dependency implicitly.   
+2.>Bean life cycle:refers to when & how the bean is instantiated, what action it performs until it lives, and when & how it is destroyed.
+   Bean life cycle is managed by the spring container. When we run the program then, first of all, the spring container gets started. After that, the container creates the instance of a bean as per the request and then dependencies are injected. And finally, the bean is destroyed when the spring container is closed. Therefore, if we want to execute some code on the bean instantiation and just after closing the spring container, then we can write that code inside the custom init() method and the destroy() method.
+   
+   By XML:
+   beans>
+    <bean id="hw" class="beans.HelloWorld" 
+            init-method="init" destroy-method="destroy"/>
+      
+  </beans>
+ 
+   Using Annotation: we need annotate init() method by @PostConstruct annotation and destroy() method by @PreDestroy annotation.
+
+    @PostConstruct
+    public void init() throws Exception
+    {
+        System.out.println(
+            "Bean HelloWorld has been "
+            + "instantiated and I'm the "
+            + "init() method");
+    }
+  
+    // Annotate this method to execute it
+    // when Spring container is closed
+    @PreDestroy
+    public void destroy() throws Exception
+    {
+        System.out.println(
+            "Conatiner has been closed "
+            + "and I'm the destroy() method");
+    }
+	
+	
+   
+.>Bean scope : There are five types of spring bean scopes:
+1.>singleton – only one instance of the spring bean will be created for the spring container. This is the default spring bean scope. While using this scope, make sure bean doesn’t have shared instance variables otherwise it might lead to data inconsistency issues.
+2.>prototype – A new instance will be created every time the bean is requested from the spring container.
+3.>request – This is same as prototype scope, however it’s meant to be used for web applications. A new instance of the bean will be created for each HTTP request.
+4.>session – A new bean will be created for each HTTP session by the container.
+5.>global-session – This is used to create global session beans for Portlet applications.
+
+@Bean
+	@Scope(value="singleton")
+    public MyBean myBean() {
+		return new MyBean();
+	}
+
+
+3.>Inversion of Controll
+1.>Dependency Injection:  Constructor based DI,Setter-Based DI,Field-Based ,Autowiring Dependencies
+<bean id="e" class="com.javatpoint.Employee">  <constructor-arg value="10" type="int"></constructor-arg>  </bean>  
+
+<bean id="obj" class="com.javatpoint.Employee">  
+<property name="id">  <value>20</value>  </property>  
+<property name="name">  <value>Arun</value>  </property>  
+<property name="city">  <value>ghaziabad</value>  </property>   
+</bean>  
+
+Resource r=new ClassPathResource("applicationContext.xml");  
+        BeanFactory factory=new XmlBeanFactory(r);  
+          
+        Employee e=(Employee)factory.getBean("obj");
+-------------------------------------------------------------------------------------------------------------------------------
+Spring Dependency Injection:
+Spring
+IOC(Inversion of Control). The Spring-Core module is responsible for injecting dependencies through either Constructor or Setter methods. 
+
+1.>Setter Dependency / Property Injection (SDI):			
+public class GFG {
+
+    // The object of the interface IGeek
+    IGeek geek;
+
+    // Setter method for property geek
+    public void setGeek(IGeek geek)
+    {
+        this.geek = geek;
+    }		
+		
+<beans> 
+    <bean id="GFG" class="com.geeksforgeeks.org.GFG">
+        <property name="geek">
+            <ref bean="CsvGFG" />
+        </property>
+    </bean>
+    
+<bean id="CsvGFG" class="com.geeksforgeeks.org.impl.CsvGFG" />        
+</beans>	
+
+2.>Constructor Dependency Injection (CDI)
+public class GFG {
+    IGeek geek;
+    // Constructor to set the CDI
+    GFG(IGeek geek)
+    {
+        this.geek = geek;
+    }
+}	
+<beans> 
+    <bean id="GFG" class="com.geeksforgeeks.org.GFG">
+        <constructor-arg>
+            <bean class="com.geeksforgeeks.org.impl.CsvGFG" />
+        </constructor-arg>
+    </bean> 
+<bean id="CsvGFG" class="com.geeksforgeeks.org.impl.CsvGFG" />
+</beans>		
+
+========================================================================================================		
+
+@Component
+public class Customers{}
+		
+		
+ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
+customers c = context.getBean(customers.class);
+
+		
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The aim of microservice is simplicity.
+
+1.> Small Focused
+2.> Loosely Coupled
+3.> Language Neutral
+4.> Bounded Context: each microservice doesn't need to understand the implementation of other microservice.
+
+Advantage of Microservice Architecture:
+
+Independent Development
+Independent Deployment
+Mixed Technology
+Fault Isolation 
+Granular Scaling
+ 
+
+Microservices vs. Monolithic Architecture
+
+Microservices	                                                  Monolithic Architecture
+1.>Every unit of the entire application should be the smallest,   1.>A single code base for all business goals.
+and it should be able to deliver one specific business goal.	
+2.>Service Startup is relatively quick	                          2.>Service startup takes more time.
+3.>Fault isolation is easy. Even if one service goes down,        3.>Fault isolation is difficult. If any specific feature is not working,
+   other can continue to function.                                   the complete system goes down. 
+4.>All microservices should be loosely coupled                    4.>Monolithic architecture is tightly coupled. 
+   so that changes made in one does not affect the other.	         Changes in one module of code affect the other
+5.>Businesses can deploy more resources to services that          5.>Since services are not isolated, individual resource allocation not possible
+  are generating higher ROI	
+6.>More hardware resources could be allocated to the              6.>Application scaling is challenging as well as wasteful.
+   service that is frequently used. In the e-commerce 
+   example above, more number of users check the product 
+   listing and search compared to payments. So, more 
+   resources could be allocated to the search and 
+   product listing microservice.	
+7.>Microservices always remains consistent and                    7.>Development tools get overburdened as the process needs 
+   continuously available.	                                                                  to start from the scratch.
+8.>Data is federated. This allows individual Microservice         8.>Data is centralized.
+ to adopt a data model best suited for its needs.	
+9.>Small Focused Teams. Parallel and faster development	          9.>Large team and considerable team management effort is required
+10.>Change in the data model of one Microservice does             10.>Change in data model affects the entire database.    
+    not affect other Microservices.	
+11.>Interacts with other microservices by using                   11.>Not applicable
+well-defined interfaces.	
+12.>Microservices work on the principle that focuses on           12.>Put emphasize on the entire project
+products, not projects	
+13.>No cross-dependencies between code bases.                     13.>One function or program depends on others.
+You can use different technologies for different Microservices.	
+=================================================================================
+
+21.>Microservices with spring boot and spring cloud.
+
+https://github.com/in28minutes/spring-microservices
+
+Introduction to microservices:
+   Rest
+   & Small well Chosen Deployable Units
+   & Cloud Enabled
+---------------------------------------------------------------------------------   
+ ->Challenges in Microservices:
+ Boundary Context
+ configuration management
+ Dynamic scale up and scale down
+ Distribute the load
+ Visibility
+ Fault Tolerance : how to prevent microservice down which can take down entire application down.adding fault tolerance in entire application
+ --------------------------------------------------------------------------------
+    CurrencyConversionService       CurrencyExchangeService   LimitsService
+	
+	                     SpringCloudConfigService
+						 
+						 
+						         Git
+ 
+ 
+---------------------------------------------------------------------------------
+22.>Spring Cloud: https://spring.io/projects/spring-cloud
+ 
+ Spring Cloud provides tools for developers to quickly build some of the common patterns is distributed systems.  
+ 
+ Some of the important projects under spring cloud: 
+ Spring Cloud Netflix
+ Spring Cloud Config.:provides centralized configuration management.
+ Spring cloud bus. : enables microservices and infrastructure components.
+ 
+-------------------------------------------------------------------------------------------------------------------------
+    Components in Spring Cloud
+	
+	*1>*Configuration Management**
+	  *Spring Cloud Config Server: We have multiple microservices , mutltiple environment for each services and multiple instances in many of these 
+                                   environment.	so lot of configuration needs to be managed by configuration team.Spring Cloud config service
+								   provides approach to store configuration in Git repository.It helps to keep configuration in one place and it will
+								   be easy to maintain.
+								  
+     *2.> Dynamic scale up and scale down:
+                 *Naming Server(Eureka) :All the instances of microservices will be registered with Eureka.
+				                          It have 2 important feature:
+										  1.>Service Registry
+										  2.>Service Discovery
+                 *Ribbion (Client Side Load Balancing): It is being used for Client Side Load Balancing.
+				                                        It will make sure load will be evenly distributed among varoius instances.
+	                    CurrencyCalculationService  
+	                               |
+	                     Ribbion ->[Naming Server]
+						         /  |  \
+						           
+	CurrencyExchangeService1  CurrencyExchangeService2  CurrencyExchangeService3
+ 						[Ribbon Load Balancing]					
+														
+                 *Feign (Easier REST Clients):	it will be used as a mechanism to write simple restful 	clients		 
+    
+     *3.>Visibility and Monitoring:
+	         *Zipkin Distributed Tracing
+			 *Netflix Zool API Gateway
+			 
+	 *4.>Fault Tolerance :we will implement fault tolerance using Hystrix.If service is down ,hystrix will help to send default response.
+	 
+==========================================================================================
+23.>Advantages of Microservices Architectures:
+     1.>It helps to adapt new technology and process adaption. (due to non monolitic architecture, all the microservices written in different language also)
+	 2.>Dynamic Scaling:We can increase and decrease load dynamically using spring cloud.(eg like in amazon , in holiday season load will be high, while 
+        rest of the day	it will be less )
+	 3.>Faster Release Cycles.
+==========================================================================================	 
+Ports which we are using to develop our services
+
+Ports
+Application	                        Port
+Limits Service	                    8080, 8081, ...
+Spring Cloud Config Server	        8888
+Currency Exchange Service	        8000, 8001, 8002, ..
+Currency Conversion Service	        8100, 8101, 8102, ...
+Netflix Eureka Naming Server	    8761
+Netflix Zuul API Gateway Server	    8765
+Zipkin Distributed Tracing Server	9411
+	 
+===========================================================================================
+URLs
+Application	                                 URL
+Limits Service	                             http://localhost:8080/limits POST -> http://localhost:8080/actuator/refresh
+Spring Cloud Config Server	                 http://localhost:8888/limits-service/default http://localhost:8888/limits-service/dev
+Currency Converter Service - Direct Call	 http://localhost:8100/currency-converter/from/USD/to/INR/quantity/10
+Currency Converter Service - Feign	         http://localhost:8100/currency-converter-feign/from/EUR/to/INR/quantity/10000
+Currency Exchange Service	                 http://localhost:8000/currency-exchange/from/EUR/to/INR http://localhost:8002/currency-exchange/from/USD/to/INR
+Eureka	                                     http://localhost:8761/
+Zuul -Currency Exchange & Exchange Services  http://localhost:8765/currency-exchange-service/currency-exchange/from/EUR/to/INR http://localhost:8765/currency-conversion-service/currency-converter-feign/from/USD/to/INR/quantity/10
+Zipkin	                                     http://localhost:9411/zipkin/
+Spring Cloud Bus Refresh	                 http://localhost:8080/bus/refresh	 
+
+============================================================================================
+Steps to create local git repository:
+
+Create a folder ,inside this open cmd prompt.
+use "git init" 
+then create a file.
+to add file use 'git add -A'
+then commit 'git commit -m "first commit"'
+-------------------------------------------------------------------------------------------- 
+ Now all the configuration is coming from git repositories with the help of spring cloud config server.
+ So all the configuration of limits-Service is seperated from the deployment of limits-Service.
+ 
+ http://localhost:8000/currency-exchange/from/USD/to/INR
+ http://localhost:8002/currency-exchange/from/USD/to/INR
+	 
+ http://localhost:8000/h2-console	 
+ 
+ http://localhost:8100/currency-convertor/from/USD/to/INR/quantity/1000
+ 
+----------------------------------------------------------------------------------------------------------------
+Feign-if we need to call a rest service inside method ,A lot of mannual stuff we have to do to call a simple web service via RestTemplate().
+      In microservices ,there will be a lot of call to other services.So we want our code to be much simplier.
+	  So that important problem,Feign solves.It makes easy to invoke other microservices/web-services .
+	  The other additional thing Feign provides is integration with Ribbion which is a Client Side Load Balancing Framework.
+	  
+	  So we need to add dependency for feign.Feign is one of the component which Spring Cloud inherits from Netflix.   
+        <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+		</dependency>
+		
+		
+	To enable Feign,we have to use below annotation.:
+    @EnableFeignClients("com.in28minutes.microservices.currencyconversionservice")	
+	
+	for that we need to create proxy,SO we created 1 interface
+	and need to use the below annotation.
+	@FeignClient(name="",url="")
+--------------------------------------------------------------------------------------------------------------------		
+->So Feign is a rest service client.It makes easy to restful web services.
+===============================================================================
+Note:If We want to run a service on another port as well then we have to mention below argument in vm argument inside run configuration.
+
+-Dserver.port=8002 
+====================================================================================================================
+Ribbon Load Balancing(Naming Server):Ribbon can use feign configuration,which helps in distributing the loads between 
+                                     different instances of a service.in our example distributing the load to different
+									 instances of CurrencyExchangeService.
+
+So in our example we will enable Ribbion on CurrencyCalculationService,so that loads can be distributed to the 
+different instances of CurrencyExchangeService.
+
+                                          CurrencyCalculationService
+										             |
+												   Ribbon ->Naming Server
+                                                     |
+									/                                           \
+                     CurrencyExchangeService  CurrencyExchangeService      CurrencyExchangeService
+													
+--------------------------------------------------------------------------------------------------------------------------							
+To distribute the load we have to add the server in the listOfServers in 'application.properties' file.
+currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8002						
+
+EurekaNamingServer:
+
+So on the based upon load ,if want to increase/decrease the number of instances.Then we can 
+handle that with Naming Server i.e,(EurekaNamingServer).All th instances of all the microservices would register with the EurekaNamingServer.
+Whenever instance of microservice comes up,it will register itself with eurka naming server.This is called Service Registration.
+So when one service (CurrencyCalculationService) wants to talk with another service,
+then it will ask the naming server ,what all instances of another service (CurrencyExchangeService) are currently running. 
+So this is called service discovery.
+
+So Now Ribbion which is maintaining client side load balancing, instead of checking all the instances in property file.It will talk to the Eureka to get all
+the list of available instances.
+==========================================================================================================================
+   
+    CurrencyCalculationService     CurrencyExchangeService     LimitsService
+	          |                               |                     |
+			                         EurekaNamingServer
+	
+	(Service Registration and Service Discovery)
+          
+Setting Up Eureka Naming Server:
+
+Create the component for Naming server. means creating new Project.
+
+and we have to use below annotation along with @SpringBootApplication,
+@EnableEurekaServer
+
+-------------------------------------------------------------------------------------------------------------------------
+Note: In project of each service like CurrencyExchangeService or CurrencyCalculationService
+inside 'application.properties' we have add below line,which signifies that Eureka will register all the instances of the services.
+
+eureka.client.service-url.default-zone=http://localhost:8761/eureka
+
+So now , we are not hardcoding the services URL with instances of a service in the 'application.properties' file of another service.
+All just we are adding row of Eureka.And Eureka will manage all the services with URL.
+
+Note this is content of the 'application.properties' file of the 'Currency-conversion-service' project.
+spring.application.name=currency-conversion-service
+server.port=8100
+eureka.client.service-url.default-zone=http://localhost:8761/eureka
+#currency-exchange-service.ribbon.listOfServers=http://localhost:8000,http://localhost:8002
+
+and in pom we have to add below dependency:
+
+         <dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+============================================================================================================================
+So basically now,without configuring the URL of CurrencyExchangeService inside the CurrencyCalculationService,we are able to get the
+CurrencyCalculationService to talk with CurrencyExchangeService.The way it is happening Ribbon ask naming server i.e,Eureka,what are the 
+instances of CurrencyExchangeService and it will get list back and then invoke the appropriate CurrencyExchangeService.
+
+                                          CurrencyCalculationService
+										             |
+											Ribbon ->Naming Server
+                                                     |
+									/                                           \
+                     CurrencyExchangeService  CurrencyExchangeService      CurrencyExchangeService
+
+In World of Microservices,there are so many microservices talking to each other.Then we would want to able to bring new 
+instance of service,take old instance down,without causing problem to any consumer.
+So That we have setup in our example between CurrencyCalculationService and CurrencyExchangeService.
+And the tools we used for that are :
+a.>Naming Server:is the one which offers service registeration and service discovery functionality.
+b.>Ribbon:provides the client side load balancing fasclity.
+c.>Feign:is used to make sure that the code we are writing to call services is very simple.
+=============================================================================================================================
+Monitoring and Trouble shooting.
+Introduction to API Gateway:
+ In microservices architecture ,we have have 100 of microservices talking to each other and there are common feature ,
+ we need to implement for all these microservices.We want to make sure every call to every microservice is
+ 1.>Authentication,authorization and security
+ 2.>Rate Limits :we want to maintain certain number of call per hour/per day.
+ 3.>Fault Tolerance:Services should we fault tolerant.If any service is down, there there should be some default response.
+ 4.>Service Aggregation.
+ 
+ So instead of allowing microservices to call each othr directly,We can do is make sure that all the call go through a API gateway.
+ and that gateway will provide the above fatures for our services.
+------------------------------------------------------------------------------------------------------------------------------
+Zuul API Gateway:
+ 1.>Setting up a Zuul API gateway server.(Creating a Project using Spring.io)
+ 2.>enable zuul proxy using below annotation and register it with Naming Server
+   @EnableZuulProxy
+   @EnableDiscoveryClient
+ 
+ 
+===============
+28 March 2021
+Naming Server 	(Service Registry)- In microservice, all the instnaces of serivces will get register with Naming Server   
+
+
+=======================================
+for naming server
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+and in microservices which want to register:
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>		
+=======================================
+Spring Cloud API Gateway
+
+Steps to work for API Gateway:
+	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+properties in application.properties:
+spring.cloud.gateway.discovery.locator.enabled=true
+
+then we can use :in Eureka appilcation is registered with this name: CURRENCY-EXCHANGE
+http://localhost:8765/CURRENCY-EXCHANGE/currency-exchange/from/USD/to/INR
+
+for lowercase
+spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+
+http://localhost:8765/currency-exchange/currency-exchange/from/USD/to/INR
+
+if we write router then we have to reomve above both properties from application.properties
+
+----------------------------------------
+
+The Advanced Message Queuing Protocol (AMQP)
+An API Gateway is a server that is the single entry point into the system. It is similar to the Facade pattern from object-oriented design. 
+The API Gateway encapsulates the internal system architecture and provides an API that is tailored to each client. 
+It might have other responsibilities such as authentication, monitoring, load balancing, 
+caching, request shaping and management, and static response handling.
+
